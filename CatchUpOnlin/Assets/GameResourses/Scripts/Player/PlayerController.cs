@@ -1,45 +1,44 @@
 using UnityEngine;
-using System.Collections.Generic;
 
 namespace CUO.Player
 {
     /// <summary>
     /// Контроллер игрока
     /// </summary>
-    [RequireComponent(typeof(PlayerMover), typeof(PlayerDash))]
     public class PlayerController : MonoBehaviour
     {
-        //TODO: Добавить возможность передавать возможность выключения управления игроком 
-        //public List<IAvailable> Availables => _availables;
-
-        private PlayerMover _playerMover;
-        private PlayerDash _playerDash;
-        private List<IAvailable>  _availables;
+        [SerializeField]
+        private BasePlayerMove _playerMover;
+        [SerializeField]
+        private BasePlayerDash _playerDash;
+        [SerializeField]
+        private PlayerJump _playerJump;
 
         private void Awake()
         {
-            _playerMover = GetComponent<PlayerMover>();
+            _playerDash.IsDash += AvailablePlayerControl;
+        }
 
-            //TODO: Попытаться сделать красиво
-            /*Debug.Log(_playerMover.IsAvailable);
-            Debug.Log(_playerMover.GetComponent<IAvailable>());
-            Debug.Log(_playerMover.GetComponent<IAvailable>().IsAvailable);
-            _availables.Add(_playerMover.GetComponent<IAvailable>());*/
-
-            _playerDash = GetComponent<PlayerDash>();
-           // _availables.Add(_playerDash.IsAvailable);
+        private void OnDestroy()
+        {
+            _playerDash.IsDash -= AvailablePlayerControl;
         }
 
         private void Start()
         {
+
             AvailablePlayerControl(true);
         }
 
+        /// <summary>
+        /// Достут управления игроком
+        /// </summary>
+        /// <param name="isAvalible"></param>
         public void AvailablePlayerControl(bool isAvalible)
         {
-            //Debug.Log(isAvalible);
             _playerMover.IsAvailable = isAvalible;
             _playerDash.IsAvailable = isAvalible;
+            _playerJump.IsAvailable = isAvalible;
         }
     }
 }

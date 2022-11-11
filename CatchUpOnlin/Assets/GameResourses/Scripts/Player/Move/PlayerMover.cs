@@ -5,33 +5,10 @@ namespace CUO.Player
     /// <summary>
     /// Компонент движения игрока
     /// </summary>
-    public class PlayerMover : MonoBehaviour, IAvailable
+    public class PlayerMover : BasePlayerMove
     {
-        /// <summary>
-        /// Возможность перемещаться
-        /// </summary>
-        public bool IsAvailable { get; set; }
-
         [SerializeField]
         private float _moveSpeed;
-
-        private PlayerInput _inputSystem;
-
-
-        private void Awake()
-        {
-            _inputSystem = new PlayerInput();
-        }
-
-        private void OnEnable()
-        {
-            _inputSystem.Enable();
-        }
-
-        private void OnDisable()
-        {
-            _inputSystem.Disable();
-        }
 
         private void Update()
         {
