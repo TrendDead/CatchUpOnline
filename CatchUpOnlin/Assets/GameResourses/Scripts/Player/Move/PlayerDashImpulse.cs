@@ -33,7 +33,8 @@ namespace CUO.Player
 
             if (direction != Vector2.zero && isGrounded && IsAvailable)
             {
-                _rigidbody.AddForce(direction.x * _distanceDash, _upForce, direction.y * _distanceDash, ForceMode.Acceleration);
+                Vector3 directionWithCamera = AddCameraAngle(direction);
+                _rigidbody.AddForce(directionWithCamera.x * _distanceDash, _upForce, directionWithCamera.z * _distanceDash, ForceMode.Acceleration);
                 isGrounded = false;
                 IsDash?.Invoke(false);
             }

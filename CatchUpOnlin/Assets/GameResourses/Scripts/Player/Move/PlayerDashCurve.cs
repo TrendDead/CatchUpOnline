@@ -29,7 +29,9 @@ namespace CUO.Player
 
             if (direction != Vector2.zero && isGrounded)
             {
-                StartCoroutine(LineDash(new Vector3(direction.x, 0f, direction.y)));
+                Vector3 directionWithCamera = AddCameraAngle(direction);
+
+                StartCoroutine(LineDash(new Vector3(directionWithCamera.x, 0f, directionWithCamera.z)));
                 IsDash?.Invoke(false);
             }
         }
@@ -38,8 +40,13 @@ namespace CUO.Player
         {
             isGrounded = false;
             var startPosition = transform.position;
-            for (float i = 0; i < _timeDash; i += Time.deltaTime)
+            for (float i = 0; i < _timeDash; i += Time.fixedDeltaTime)
             {
+                if (isGrounded)
+                {
+                    break;
+                }
+
                 float lerpRatio = i / _timeDash;
                 Vector3 positionOffset = (_dashCurve.Evaluate(lerpRatio) * direction) + ((Vector3.up * _dashCurve.Evaluate(lerpRatio)) * _upForce);
                 transform.position = Vector3.Lerp(startPosition, startPosition + (direction * _distanceDash), lerpRatio) + positionOffset;
@@ -56,9 +63,16 @@ namespace CUO.Player
 
         private void OnCollisionEnter(Collision collision)
         {
-            if (collision.gameObject.tag == "Ground" && !isGrounded)
+            if ((collision.gameObject.tag == "Ground" || collision.gameObject.tag == "Wall") && !isGrounded)
             {
-                IsDash?.Invoke(true);
+                isGrounded = true;
+            }
+        }
+
+        private void OnCollisionStay(Collision collision)
+        {
+            if (collision.gameObject.tag == "Wall" && !isGrounded)
+            {
                 isGrounded = true;
             }
         }

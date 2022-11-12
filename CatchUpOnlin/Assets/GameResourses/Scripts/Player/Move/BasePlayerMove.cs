@@ -12,6 +12,8 @@ namespace CUO.Player
         /// </summary>
         [HideInInspector]
         public bool IsAvailable;
+        [SerializeField]
+        private CameraRotateController _cameraRotateController; // не везде он нужен, лучше убрать
 
         protected PlayerInput _inputSystem;
 
@@ -28,6 +30,12 @@ namespace CUO.Player
         protected virtual void OnDisable()
         {
             _inputSystem.Disable();
+        }
+
+        protected Vector3 AddCameraAngle(Vector2 direction)
+        {
+            float targetAngle = Mathf.Atan2(direction.x, direction.y) * Mathf.Rad2Deg + _cameraRotateController.transform.eulerAngles.y;
+            return (Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward).normalized;
         }
     }
 }
