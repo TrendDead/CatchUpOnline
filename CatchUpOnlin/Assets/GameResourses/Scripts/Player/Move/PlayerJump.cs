@@ -14,7 +14,7 @@ namespace CUO.Player
         private AnimationCurve _speedJumpCurve;
 
         private Rigidbody _rigidbody;
-        private bool isGrounded = true;
+        //private bool isGrounded = true;
 
         private void Start()
         {
@@ -36,12 +36,12 @@ namespace CUO.Player
         private void Jump()
         {
             _rigidbody.AddForce(Vector3.up * _jumpHeight);
-           // _rigidbody.velocity = Vector3.up * _jumpHeight; //TODO: сделать контролируетмый прыжок по кривой
+            // _rigidbody.velocity = Vector3.up * _jumpHeight; //TODO: сделать контролируетмый прыжок по кривой через управление velocity
         }
 
         private IEnumerator LineDash()
         {
-            isGrounded = false;
+           // isGrounded = false;
             Vector2 direction = _inputSystem.Player.Move.ReadValue<Vector2>();
            
             var startPosition = transform.position;
@@ -76,12 +76,12 @@ namespace CUO.Player
                 yield return null;
         }
 
-        private void OnCollisionEnter(Collision collision)
-        {
-            if (collision.gameObject.tag == "Ground" && !isGrounded)
-            {
-                isGrounded = true;
-            }
-        }
+        //private void OnCollisionEnter(Collision collision)
+        //{
+        //    if (collision.gameObject.tag == "Ground" && !isGrounded)
+        //    {
+        //        isGrounded = true;
+        //    }
+        //}
     }
 }
