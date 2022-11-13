@@ -13,21 +13,28 @@ namespace CUO.Player
         private BasePlayerDash _playerDash;
         [SerializeField]
         private PlayerJump _playerJump;
+        [SerializeField]
+        private PlayerAttack _playerAttack;
 
         private void Awake()
         {
-            _playerDash.IsDash += AvailablePlayerControl;
+            _playerDash.IsDash += AttackAttempt;
         }
 
         private void OnDestroy()
         {
-            _playerDash.IsDash -= AvailablePlayerControl;
+            _playerDash.IsDash -= AttackAttempt;
         }
 
         private void Start()
         {
-
             AvailablePlayerControl(true);
+        }
+
+        private void AttackAttempt(bool isAvalible)
+        {
+            AvailablePlayerControl(isAvalible);
+            _playerAttack.UpdateDashInfo(!isAvalible);
         }
 
         /// <summary>
