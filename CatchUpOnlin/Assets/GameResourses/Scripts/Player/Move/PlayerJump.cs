@@ -4,7 +4,7 @@ using UnityEngine;
 namespace CUO.Player
 {
     [RequireComponent(typeof(Rigidbody))]
-    public class PlayerJump : BasePlayerMove //FIXME: Попытаться сделать через кривую
+    public class PlayerJump : BasePlayerMove
     {
         [SerializeField]
         private float _jumpHeight;
@@ -14,7 +14,7 @@ namespace CUO.Player
         private AnimationCurve _speedJumpCurve;
 
         private Rigidbody _rigidbody;
-        //private bool isGrounded = true;
+        private bool isGrounded = true;
 
         private void Start()
         {
@@ -35,22 +35,22 @@ namespace CUO.Player
 
         private void Jump()
         {
-            _rigidbody.AddForce(Vector3.up * _jumpHeight);
-            // _rigidbody.velocity = Vector3.up * _jumpHeight; //TODO: сделать контролируетмый прыжок по кривой через управление velocity
+            if(IsAvailable && isGrounded)
+            {
+                StartCoroutine(CurveJump());
+            }
         }
 
-        private IEnumerator LineDash()
+        private IEnumerator CurveJump()
         {
-           // isGrounded = false;
-            Vector2 direction = _inputSystem.Player.Move.ReadValue<Vector2>();
+            isGrounded = false;
            
             var startPosition = transform.position;
 
-            /*for (float i = 0; i < _timeJump; i += Time.deltaTime)
+            for (float i = 0; i < _timeJump; i += Time.deltaTime)
             {
-                float lerpRatio = i / _timeJump;
-                Vector3 positionOffset = (_dashCurve.Evaluate(lerpRatio) * direction) + ((Vector3.up * _dashCurve.Evaluate(lerpRatio)) * _upForce);
-                transform.position = Vector3.Lerp(startPosition, startPosition + (direction * _distanceDash), lerpRatio) + positionOffset;
+                float lerp = i / _timeJump;
+                _rigidbody.velocity = (Vector3.up * _speedJumpCurve.Evaluate(lerp)) * _jumpHeight;
 
                 yield return null;
 
@@ -59,29 +59,15 @@ namespace CUO.Player
                     break;
                 }
             }
-
-            for (float i = 0; i < _timeDash; i += Time.deltaTime)
-            {
-                float lerpRatio = i / _timeDash;
-                Vector3 positionOffset = (_dashCurve.Evaluate(lerpRatio) * direction) + ((Vector3.up * _dashCurve.Evaluate(lerpRatio)) * _upForce);
-                transform.position = Vector3.Lerp(startPosition, startPosition + (direction * _distanceDash), lerpRatio) + positionOffset;
-
-                yield return null;
-
-                if (isGrounded)
-                {
-                    break;
-                }
-            }*/
                 yield return null;
         }
 
-        //private void OnCollisionEnter(Collision collision)
-        //{
-        //    if (collision.gameObject.tag == "Ground" && !isGrounded)
-        //    {
-        //        isGrounded = true;
-        //    }
-        //}
+        private void OnCollisionEnter(Collision collision)
+        {
+            if (collision.gameObject.tag == "Ground" && !isGrounded)
+            {
+                isGrounded = true;
+            }
+        }
     }
 }

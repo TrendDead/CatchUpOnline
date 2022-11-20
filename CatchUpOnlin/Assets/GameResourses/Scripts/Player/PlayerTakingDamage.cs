@@ -1,13 +1,16 @@
 using UnityEngine;
 using System.Collections;
+using Mirror;
 
 namespace CUO.Player
 {
     /// <summary>
     /// Компонент получения урона игроком
     /// </summary>
-    public class PlayerTakingDamage : MonoBehaviour
+    public class PlayerTakingDamage : NetworkBehaviour
     {
+        public bool IsCanTakeDamage { get; private set; }
+
         [SerializeField]
         private float _recoveryTime = 3;
         [SerializeField]
@@ -16,22 +19,29 @@ namespace CUO.Player
         private Material _damageMaterial;
 
         private Renderer _playerMaterial;
-        private bool IsCanTakeDamage = true;
 
         private void Start()
         {
             _playerMaterial = GetComponent<Renderer>();
+            IsCanTakeDamage = true;
         }
 
-        public bool GetDamage()
+
+        [Client]
+        public void GetDamage()
         {
             if(IsCanTakeDamage)
             {
                 StartCoroutine(RecoveryTime());
-                return true;
             }
-            return false;
         }
+
+        [Command(requiresAuthority = false)]
+        public void Test()
+        {
+            StartCoroutine(RecoveryTime());
+        }
+
 
         private IEnumerator RecoveryTime()
         {

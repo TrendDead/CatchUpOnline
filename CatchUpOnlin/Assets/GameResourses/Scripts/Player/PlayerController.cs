@@ -1,3 +1,4 @@
+using Mirror;
 using UnityEngine;
 
 namespace CUO.Player
@@ -5,8 +6,10 @@ namespace CUO.Player
     /// <summary>
     /// Контроллер игрока
     /// </summary>
-    public class PlayerController : MonoBehaviour
+    public class PlayerController : NetworkBehaviour
     {
+        private const string REMOTELAYER = "RemotePlayer";
+
         [SerializeField]
         private BasePlayerMove _playerMover;
         [SerializeField]
@@ -15,22 +18,54 @@ namespace CUO.Player
         private PlayerJump _playerJump;
         [SerializeField]
         private PlayerAttack _playerAttack;
+        [SerializeField]
+        private CameraRotateController _cameraRotateControllerPrefab;
 
-        private void Awake()
-        {
-            _playerDash.IsDash += AttackAttempt;
-        }
+        private CameraRotateController _cameraRotateController;
 
         private void OnDestroy()
         {
             _playerDash.IsDash -= AttackAttempt;
+            _playerDash.IsDash -= CmdAttackAttempt;
+            Camera.main.gameObject.SetActive(true);
+            Destroy(_cameraRotateController);
         }
 
         private void Start()
         {
-            AvailablePlayerControl(true);
+            _playerDash.IsDash += AttackAttempt;
+            _playerDash.IsDash += CmdAttackAttempt;
+            if (isLocalPlayer)
+            {
+                Camera.main.gameObject.SetActive(false);
+                _cameraRotateController = Instantiate(_cameraRotateControllerPrefab, gameObject.transform.position, Quaternion.identity);
+                _cameraRotateController.Target = this;
+                _playerMover.GetCamera(_cameraRotateController);
+                _playerJump.GetCamera(_cameraRotateController);
+                AvailablePlayerControl(true);
+            }
+            else
+            {
+                gameObject.layer = LayerMask.NameToLayer(REMOTELAYER);
+                _playerMover.enabled = false;
+                //_playerDash.enabled = false;
+                _playerJump.enabled = false;
+                AvailablePlayerControl(false);
+            }
+
+            _playerDash.GetCamera(_cameraRotateController);
+
+            transform.name = $"Player {GetComponent<NetworkIdentity>().netId}";
         }
 
+        [Command(requiresAuthority = false)] //Костыль так-то
+        private void CmdAttackAttempt(bool isAvalible)
+        {
+            AvailablePlayerControl(isAvalible);
+            _playerAttack.UpdateDashInfo(!isAvalible);
+        }
+
+        [Client]
         private void AttackAttempt(bool isAvalible)
         {
             AvailablePlayerControl(isAvalible);

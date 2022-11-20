@@ -1,15 +1,16 @@
 using UnityEngine;
+using Mirror;
 
 namespace CUO.Player
 {
     /// <summary>
     /// Комапонент атаки игрока
     /// </summary>
-    public class PlayerAttack : MonoBehaviour
+    public class PlayerAttack : NetworkBehaviour
     {
-        [SerializeField]
-        private int _countSuccessAttack = 0;
+        [SyncVar]
         private bool _isDash = false;
+        private int _countSuccessAttack = 0;
 
         /// <summary>
         /// Обнуление счетчика
@@ -25,15 +26,30 @@ namespace CUO.Player
         /// </summary>
         public void UpdateDashInfo(bool dash) => _isDash = dash;
 
-        private void OnTriggerEnter(Collider other)
+        //private void OnTriggerEnter(Collider other)
+        //{
+        //    if (other.gameObject.TryGetComponent(out PlayerTakingDamage otherPlayer))
+        //    {
+        //        if(otherPlayer.IsCanTakeDamage && _isDash)
+        //        {
+        //            otherPlayer.GetDamage();
+        //            otherPlayer.Test();
+        //            _countSuccessAttack++;
+        //        }
+        //    }
+        //}
+
+        private void OnCollisionEnter(Collision collision)
         {
-            if (other.gameObject.TryGetComponent(out PlayerTakingDamage otherPlayer) && _isDash)
+            if (collision.gameObject.TryGetComponent(out PlayerTakingDamage otherPlayer))
             {
-                if(otherPlayer.GetDamage())
+                if(otherPlayer.IsCanTakeDamage && _isDash)
                 {
+                    otherPlayer.GetDamage();
+                    otherPlayer.Test();
                     _countSuccessAttack++;
                 }
-            }
+}
         }
     }
 }

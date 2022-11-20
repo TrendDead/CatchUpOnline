@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using Mirror;
 
 namespace CUO.Player
 {
@@ -19,28 +20,51 @@ namespace CUO.Player
         private float _upForce;
         [SerializeField]
         private AnimationCurve _dashCurve;
+        [SerializeField]
+        private float _rollbackTime = 1;
 
+        private Rigidbody _rigidbody;
         private bool isGrounded = true;
+        private bool isCanDash = true;
 
+        private void Start()
+        {
+            _rigidbody = GetComponent<Rigidbody>();
+        }
 
+        [Client]
         protected override void Dash()
         {
             Vector2 direction = _inputSystem.Player.Move.ReadValue<Vector2>();
 
-            if (direction != Vector2.zero && isGrounded)
+            if (direction != Vector2.zero && isGrounded && isCanDash)
             {
                 Vector3 directionWithCamera = AddCameraAngle(direction);
 
                 StartCoroutine(LineDash(new Vector3(directionWithCamera.x, 0f, directionWithCamera.z)));
-                IsDash?.Invoke(false);
+                StartCoroutine(RollbackDash(_rollbackTime));
             }
+        }
+
+        private IEnumerator RollbackDash(float WhaitTime)
+        {
+            isCanDash = false;
+            yield return new WaitForSeconds(WhaitTime);
+            isCanDash = true;
         }
 
         private IEnumerator LineDash(Vector3 direction)
         {
+            IsDash?.Invoke(false);
             isGrounded = false;
+
+            _rigidbody.velocity = Vector3.zero;
+
             var startPosition = transform.position;
-            for (float i = 0; i < _timeDash; i += Time.fixedDeltaTime)
+
+  
+
+            for (float i = 0; i < _timeDash; i += Time.deltaTime)
             {
                 if (isGrounded)
                 {
@@ -53,28 +77,21 @@ namespace CUO.Player
 
                 yield return null;
 
-                if (isGrounded)
-                {
-                    break;
-                }
             }
-            IsDash?.Invoke(true);
+
+            _rigidbody.velocity = (direction + Vector3.down) * 20;
+
+           IsDash?.Invoke(true);
         }
 
         private void OnCollisionEnter(Collision collision)
         {
-            if ((collision.gameObject.tag == "Ground" || collision.gameObject.tag == "Wall") && !isGrounded)
+            if ((collision.gameObject.tag == "Ground") && !isGrounded)
             {
+                _rigidbody.velocity = Vector3.zero;
                 isGrounded = true;
             }
         }
 
-        private void OnCollisionStay(Collision collision)
-        {
-            if (collision.gameObject.tag == "Wall" && !isGrounded)
-            {
-                isGrounded = true;
-            }
-        }
     }
 }
