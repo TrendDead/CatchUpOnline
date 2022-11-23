@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace CUO.Player
 {
+    /// <summary>
+    /// Компонент прыжка персанажа
+    /// </summary>
     [RequireComponent(typeof(Rigidbody))]
     public class PlayerJump : BasePlayerMove
     {

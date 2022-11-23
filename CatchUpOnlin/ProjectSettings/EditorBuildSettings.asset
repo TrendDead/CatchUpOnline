@@ -6,6 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/GameResourses/Scenes/ConnectionRoom.unity
+    guid: 113980b0300df0a4cb945ec3b2358f59
+  - enabled: 1
+    path: Assets/GameResourses/Scenes/Lobby.unity
+    guid: 68870a5d071513e41ac795830d61d019
+  - enabled: 1
     path: Assets/GameResourses/Scenes/GameScene.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   m_configObjects: {}
