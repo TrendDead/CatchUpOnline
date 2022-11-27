@@ -29,7 +29,7 @@ namespace CUO.Player
         [Header("Online Components")]
         [SyncVar]
         public string MatchID;
-        public static PlayerController LocalPlayer; //лениво что ппц, переделать
+        public static PlayerController LocalPlayer
 
         private NetworkMatch _networkMatch;
 

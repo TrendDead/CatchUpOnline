@@ -15,7 +15,7 @@ namespace CUO.Online
         /// <summary>
         /// Синглтон
         /// </summary>
-        public static LobbyMenu Instance; //так-то тоже ленивая хрень этот ваш синглтон
+        public static LobbyMenu Instance;
 
         public readonly SyncList<Match> _matches = new SyncList<Match>();
         public readonly SyncList<string> _matchIDs = new SyncList<string>();
@@ -58,7 +58,7 @@ namespace CUO.Online
 
         private void Start()
         {
-            StartCoroutine(LateStart()); //FIXME <=== Костылим потехонечку
+            StartCoroutine(LateStart());
         }
 
         private IEnumerator LateStart()
@@ -71,7 +71,7 @@ namespace CUO.Online
 
                 for (int i = 0; i < players.Length; i++)
                 {
-                    players[i].gameObject.transform.localScale = Vector3.zero; //FEXME: шо за нах? Дич! <==========
+                    players[i].gameObject.transform.localScale = Vector3.zero; //FEXME: переделать
                     players[i].GetComponent<Rigidbody>().isKinematic = true;
                 }
             }
@@ -179,7 +179,7 @@ namespace CUO.Online
             return id;
         }
 
-        public void SpawnPlayerUIPrefab(PlayerController player) //должен спавнить игрока но брать ui, мб придется по другому делать
+        public void SpawnPlayerUIPrefab(PlayerController player)
         {
             GameObject newUIPlayer = Instantiate(_playerUIPrefab, _playerUIParent);
             newUIPlayer.GetComponent<PlayerUI>().SetPlayer(player);
@@ -213,7 +213,7 @@ namespace CUO.Online
         }
     }
 
-    public static class MatchExtension //Можно ли вынести?! И для чего статик?
+    public static class MatchExtension
     {
         public static Guid ToGuid(this string id)
         {
